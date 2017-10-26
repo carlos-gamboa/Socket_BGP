@@ -38,7 +38,6 @@ public class Client extends Thread {
                 PrintWriter out =
                         new PrintWriter(echoSocket.getOutputStream(), true);
         ) {
-
             while (clientIsOn) {
                 userInput = routesToString();
                 out.println(userInput);
