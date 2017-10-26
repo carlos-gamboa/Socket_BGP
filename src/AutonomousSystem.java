@@ -14,17 +14,17 @@ import java.util.*;
 @Log
 public class AutonomousSystem {
 
-    private static int port;
+    private int port;
     private volatile Map<String, Integer> neighbours;
     private volatile ArrayList<String> networks;
-    private static Boolean on;
+    private Boolean on;
     private volatile ListMultimap<String, String> routesMultimap;
 
-    private static Boolean isOn () {
+    private Boolean isOn () {
         return on;
     }
 
-    private static void loadFile (String file) {
+    private void loadFile (String file) {
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line = br.readLine();
@@ -64,13 +64,13 @@ public class AutonomousSystem {
         }
     }
 
-    private static void startAS (Scanner sc) {
+    private void startAS (Scanner sc) {
         System.out.print("Enter AS information filename: ");
         String file = sc.nextLine();
         loadFile(file);
     }
 
-    private static void startTerminal () {
+    public void startTerminal () {
         val sc = new Scanner(System.in);
         startAS(sc);
         System.out.print("> ");
@@ -104,20 +104,20 @@ public class AutonomousSystem {
         }
     }
 
-    private static void stop() {
+    private void stop() {
         if (isOn()) {
             on = false;
             log.info("The server has stopped");
         }
     }
 
-    private static void add (String network) {
+    private void add (String network) {
         if (isOn()) {
             networks.add(network);
         }
     }
 
-    private static void show_Route() {
+    private void show_Route() {
         if (isOn()) {
             for (String key : routesMultimap.keySet()) {
                 for (String value : routesMultimap.get(key)) {
@@ -127,20 +127,19 @@ public class AutonomousSystem {
         }
     }
 
-    private static void start (){
+    private void start (){
         if (!isOn()) {
             on = true;
             log.info("The server has started");
         }
     }
 
-    public static void main(String[] args) {
+    public AutonomousSystem () {
         on = false;
         networks = new ArrayList<>();
         neighbours = new HashMap<>();
         routesMultimap = ArrayListMultimap.create();
 
         log.info("The Server is running.");
-        startTerminal();
     }
 }
