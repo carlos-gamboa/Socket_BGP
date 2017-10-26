@@ -18,6 +18,8 @@ public class Client extends Thread {
     private ListMultimap<String, String> routesMultimap;
     private String hostName;
     private int portNumber;
+    boolean clientIsOn;
+    String userInput;
 
     public Client (String ip, Integer client_Port, Map<String, Integer> neighbours, ArrayList<String>  networks, ListMultimap<String, String> routesMultimap) {
         this.neighbours = neighbours;
@@ -25,6 +27,7 @@ public class Client extends Thread {
         this.routesMultimap = routesMultimap;
         this.hostName = ip;
         this.portNumber = client_Port;
+        clientIsOn = true;
     }
 
     @Override
@@ -34,14 +37,12 @@ public class Client extends Thread {
                 Socket echoSocket = new Socket(hostName, portNumber);
                 PrintWriter out =
                         new PrintWriter(echoSocket.getOutputStream(), true);
-                BufferedReader in =
-                        new BufferedReader(
-                                new InputStreamReader(echoSocket.getInputStream()));
         ) {
-            String userInput = routesToString();
+
             while (clientIsOn) {
+                userInput = routesToString();
                 out.println(userInput);
-                //System.out.println("echo: " + in.readLine());
+                Thread.sleep(30000); //wait 30s
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
@@ -50,6 +51,8 @@ public class Client extends Thread {
             System.err.println("Couldn't get I/O for the connection to " +
                     hostName);
             System.exit(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
     }
