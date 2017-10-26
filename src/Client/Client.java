@@ -37,14 +37,11 @@ public class Client extends Thread {
                 BufferedReader in =
                         new BufferedReader(
                                 new InputStreamReader(echoSocket.getInputStream()));
-                BufferedReader stdIn =
-                        new BufferedReader(
-                                new InputStreamReader(System.in))
         ) {
-            String userInput;
-            while ((userInput = stdIn.readLine()) != null) {
+            String userInput = routesToString();
+            while (clientIsOn) {
                 out.println(userInput);
-                System.out.println("echo: " + in.readLine());
+                //System.out.println("echo: " + in.readLine());
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
