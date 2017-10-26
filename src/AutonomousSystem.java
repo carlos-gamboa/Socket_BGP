@@ -18,7 +18,7 @@ public class AutonomousSystem {
     private volatile Map<String, Integer> neighbours;
     private volatile ArrayList<String> networks;
     private Boolean on;
-    private volatile ListMultimap<String, String> routesMultimap;
+    private volatile ListMultimap<String, ArrayList<Integer>> routesMultimap;
 
     private Boolean isOn () {
         return on;
@@ -120,11 +120,22 @@ public class AutonomousSystem {
     private void show_Route() {
         if (isOn()) {
             for (String key : routesMultimap.keySet()) {
-                for (String value : routesMultimap.get(key)) {
-                    System.out.println("Red " + key + ": " + value);
+                for (ArrayList<Integer> value : routesMultimap.get(key)) {
+                    System.out.println("Red " + key + ": " + routesArrayToString(value));
                 }
             }
         }
+    }
+
+    private String routesArrayToString(ArrayList<Integer> routes) {
+        String result = "";
+        for (int i = 0; i < routes.size(); ++i) {
+            result = result + "AS" + String.valueOf(routes.get(i));
+            if (i != routes.size() - 1) {
+                result = result + "-";
+            }
+        }
+        return result;
     }
 
     private void start (){
