@@ -19,7 +19,6 @@ public class Client extends Thread {
     private ArrayList<String> networks;
     private ListMultimap<String, ArrayList<Integer>> routesMultimap;
     private Integer as_ID;
-    private ListMultimap<String, String> routesMultimap;
     private String hostName;
     private int portNumber;
     boolean clientIsOn;
