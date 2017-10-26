@@ -17,7 +17,7 @@ public class Client extends Thread {
     private ArrayList<String> networks;
     private ListMultimap<String, String> routesMultimap;
     private String hostName;
-    private String portNumber;
+    private int portNumber;
 
     public Client (String ip, Integer client_Port, Map<String, Integer> neighbours, ArrayList<String>  networks, ListMultimap<String, String> routesMultimap) {
         this.neighbours = neighbours;
