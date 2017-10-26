@@ -19,6 +19,7 @@ public class AutonomousSystem {
     private volatile ArrayList<String> networks;
     private Boolean on;
     private volatile ListMultimap<String, ArrayList<Integer>> routesMultimap;
+    private int id;
 
     private Boolean isOn () {
         return on;
@@ -40,6 +41,9 @@ public class AutonomousSystem {
                 else if (line.equals("#Escuchar vecinos")) {
                     type = 3;
                 }
+                else if (line.equals("#ID")){
+                    type = 4;
+                }
                 else {
                     if(type == 1){
                         networks.add(line);
@@ -48,11 +52,14 @@ public class AutonomousSystem {
                         String ip = tokens.nextToken();
                         Integer client_Port = Integer.parseInt(tokens.nextToken());
                         neighbours.put(ip, client_Port);
-                        new Client(ip, client_Port, neighbours, networks, routesMultimap).start();
+                        new Client(id, ip, client_Port, neighbours, networks, routesMultimap).start();
                     }
                     else if (type == 3) {
                         port = Integer.parseInt(line);
                         new Server(port, neighbours, networks, routesMultimap).start();
+                    }
+                    else if (type == 4) {
+                        id = Integer.parseInt(line);
                     }
                 }
                 line = br.readLine();
