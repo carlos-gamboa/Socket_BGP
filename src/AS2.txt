@@ -1,0 +1,8 @@
+#ID
+2
+#Redes conocidas
+230.9.0.0
+12.111.3.0
+#Vecinos BGP
+#Escuchar vecinos
+2222

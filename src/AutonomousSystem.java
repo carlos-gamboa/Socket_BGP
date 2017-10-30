@@ -1,8 +1,9 @@
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import lombok.extern.java.Log;
 import lombok.val;
+
 import Server.Server;
 import Client.Client;
 
@@ -14,23 +15,42 @@ import java.util.*;
 @Log
 public class AutonomousSystem {
 
-    private int port;
-    private volatile Map<String, Integer> neighbours;
-    private volatile ArrayList<String> networks;
-    private Boolean on;
-    private volatile ListMultimap<String, ArrayList<Integer>> routesMultimap;
-    private int id;
+    private volatile Map<String, Integer> neighbours; //Map that contains the associated AS's and the port for each one
+    private volatile ArrayList<String> networks; //Array with the AS's known networks
+    private Boolean on; //Indicate if the AS is running
+    private volatile ListMultimap<String, ArrayList<Integer>> routesMultimap; //Map that contains the network and an array with the other AS's id that are part of the route
+    private int id; //Identifier of the AS
 
+    /**
+     * Creates an AutonomousSystem
+     */
+    public AutonomousSystem () {
+        on = false;
+        networks = new ArrayList<>();
+        neighbours = new HashMap<>();
+        routesMultimap = ArrayListMultimap.create();
+        log.info("The server is running.");
+    }
+
+    /**
+     * Verifies if the AS is running
+     * @return on
+     */
     private Boolean isOn () {
         return on;
     }
 
+    /**
+     * Reads a file for create an AS
+     * @param file with the AS information
+     */
     private void loadFile (String file) {
+        int port;
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line = br.readLine();
             int type = 0;
-
+            //Interprets file's information
             while (line != null) {
                 if (line.equals("#Redes conocidas")){
                     type = 1;
@@ -48,6 +68,7 @@ public class AutonomousSystem {
                     if(type == 1){
                         networks.add(line);
                     } else if (type == 2) {
+                        //Esto sirve solo para un vecino
                         StringTokenizer tokens = new StringTokenizer(line, ":");
                         String ip = tokens.nextToken();
                         Integer client_Port = Integer.parseInt(tokens.nextToken());
@@ -71,21 +92,29 @@ public class AutonomousSystem {
         }
     }
 
+    /**
+     * Reads th file's name
+     * @param sc Scanner for read-write operations
+     */
     private void startAS (Scanner sc) {
         System.out.print("Enter AS information filename: ");
         String file = sc.nextLine();
         loadFile(file);
     }
 
+    /**
+     * Allows th user to use specified commands on the terminal
+     */
     public void startTerminal () {
         val sc = new Scanner(System.in);
         startAS(sc);
         System.out.print("> ");
-        String line = "";
+        String line;
         while (true) {
             line = sc.nextLine();
-            StringTokenizer tokens = new StringTokenizer(line, "<");
+            StringTokenizer tokens = new StringTokenizer(line, ">");
             String command = tokens.nextToken();
+            //Creo que no estamos tomando bien la subred
             String network = "";
             if (tokens.hasMoreTokens()){
                 network = tokens.nextToken();
@@ -111,6 +140,9 @@ public class AutonomousSystem {
         }
     }
 
+    /**
+     * Stops the AS if it's running
+     */
     private void stop() {
         if (isOn()) {
             on = false;
@@ -118,22 +150,34 @@ public class AutonomousSystem {
         }
     }
 
+    /**
+     * Adds specified networks to the AS's known networks if the AS is running
+     * @param network
+     */
     private void add (String network) {
         if (isOn()) {
             networks.add(network);
         }
     }
 
+    /**
+     * Shows all the routes from the AS to the other networks if the AS is running
+     */
     private void show_Route() {
         if (isOn()) {
-            for (String key : routesMultimap.keySet()) {
-                for (ArrayList<Integer> value : routesMultimap.get(key)) {
+            for (String key : routesMultimap.keySet()) { //Iterate over the networks
+                for (ArrayList<Integer> value : routesMultimap.get(key)) { //Iterate over the routes array of each network
                     System.out.println("Red " + key + ": " + routesArrayToString(value));
                 }
             }
         }
     }
 
+    /**
+     * Converts the routes array to an specific type of string
+     * @param routes an array of the AS's id that are part of a route
+     * @return result a String with the desired content
+     */
     private String routesArrayToString(ArrayList<Integer> routes) {
         String result = "";
         for (int i = 0; i < routes.size(); ++i) {
@@ -145,19 +189,13 @@ public class AutonomousSystem {
         return result;
     }
 
+    /**
+     * Starts the AS's operation
+     */
     private void start (){
         if (!isOn()) {
             on = true;
             log.info("The server has started");
         }
-    }
-
-    public AutonomousSystem () {
-        on = false;
-        networks = new ArrayList<>();
-        neighbours = new HashMap<>();
-        routesMultimap = ArrayListMultimap.create();
-
-        log.info("The Server is running.");
     }
 }

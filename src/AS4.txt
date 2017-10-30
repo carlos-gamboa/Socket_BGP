@@ -1,0 +1,9 @@
+#ID
+4
+#Redes conocidas
+24.10.0.0
+250.120.1.0
+#Vecinos BGP
+192.168.1.2:4444
+#Escuchar vecinos
+7777
