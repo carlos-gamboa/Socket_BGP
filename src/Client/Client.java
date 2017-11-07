@@ -84,12 +84,9 @@ public class Client extends Thread {
      * @return result A string with the route
      */
     private String arrayToString(ArrayList<Integer> routes) {
-        String result = "";
+        String result = "AS" + as_ID;
         for (int i = 0; i < routes.size(); ++i) { //Iterates over the routes array
-            result = result + "AS" + String.valueOf(routes.get(i)); //Add each AS's id
-            if (i != routes.size() - 1) {
-                result = result + "-";
-            }
+            result = result + "-AS" + String.valueOf(routes.get(i)); //Add each AS's id
         }
         return result;
     }

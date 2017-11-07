@@ -4,9 +4,7 @@ import com.google.common.collect.ListMultimap;
 import lombok.extern.java.Log;
 import lombok.val;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -42,8 +40,10 @@ public class Server extends Thread {
             Collection<ArrayList<Integer>> values = routesMultimap.get(key); //Set of all the routes for each network
             for (Iterator<ArrayList<Integer>> iterator = values.iterator(); iterator.hasNext();) { //Iterates over the set of routes
                 ArrayList<Integer> route = iterator.next();
-                if (route.get(0) == as){ //If the route contains the specified AS, remove it
-                    routesMultimap.remove(key, route);
+                if (!route.isEmpty()){
+                    if (route.get(0) == as){ //If the route contains the specified AS, remove it
+                        routesMultimap.remove(key, route);
+                    }
                 }
             }
         }
@@ -97,18 +97,18 @@ public class Server extends Thread {
             while (true) {
                 try {
                     Socket mini_Server = socket.accept(); //create connection between AS's
-                    log.info("Device " + mini_Server.getInetAddress() + " connected");
+                    System.err.println("Device " + mini_Server.getInetAddress() + " connected");
 
-                    String message = mini_Server.getInputStream().toString(); //receive a message with the updated route
+                    String message = new BufferedReader(new InputStreamReader(mini_Server.getInputStream())).readLine(); //receive a message with the updated route
                     updateRoutes(message);
 
                 } catch (IOException ex) {
-                    log.warning("Cannot connect device");
+                    System.err.println("Cannot connect device");
                 }
             }
         }
         catch (IOException e) {
-            log.warning("Cannot create server");
+            System.err.println("Cannot create server");
         }
     }
 

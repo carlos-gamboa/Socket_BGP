@@ -67,6 +67,7 @@ public class AutonomousSystem {
                 }
                 else {
                     if(type == 1){
+                        routesMultimap.put(line, new ArrayList<>());
                         networks.add(line);
                     } else if (type == 2) {
                         //Esto sirve solo para un vecino
@@ -168,6 +169,7 @@ public class AutonomousSystem {
      */
     private void add (String network) {
         if (isOn()) {
+            routesMultimap.put(network, new ArrayList<>());
             networks.add(network);
         }
     }
