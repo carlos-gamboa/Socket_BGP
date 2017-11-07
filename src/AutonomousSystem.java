@@ -29,7 +29,7 @@ public class AutonomousSystem {
         networks = new ArrayList<>();
         neighbours = new HashMap<>();
         routesMultimap = ArrayListMultimap.create();
-        log.info("The server is running.");
+        System.out.println("The server is running.");
     }
 
     /**
@@ -43,8 +43,9 @@ public class AutonomousSystem {
     /**
      * Reads a file for create an AS
      * @param file with the AS information
+     * @return Tru if the file was opened. False if the file wasn't opened.
      */
-    private void loadFile (String file) {
+    private Boolean loadFile (String file) {
         int port;
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -88,8 +89,10 @@ public class AutonomousSystem {
             br.close();
         }
         catch (IOException e) {
-            System.out.print("Could not find the file.\nEnter AS information filename: ");
+            System.out.print("File not found. Enter AS information filename: ");
+            return false;
         }
+        return true;
     }
 
     /**
@@ -97,9 +100,12 @@ public class AutonomousSystem {
      * @param sc Scanner for read-write operations
      */
     private void startAS (Scanner sc) {
+        Boolean done;
         System.out.print("Enter AS information filename: ");
-        String file = sc.nextLine();
-        loadFile(file);
+        do {
+            String file = sc.nextLine();
+            done = loadFile(file);
+        } while (!done);
     }
 
     /**
