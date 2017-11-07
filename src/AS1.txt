@@ -4,6 +4,5 @@
 82.21.0.0
 121.11.3.0
 #Vecinos BGP
-192.168.1.1:5555
 #Escuchar vecinos
 1111

@@ -114,17 +114,23 @@ public class AutonomousSystem {
     public void startTerminal () {
         val sc = new Scanner(System.in);
         startAS(sc);
-        System.out.print("> ");
         String line;
         while (true) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                System.err.println("Error en la terminal.");
+            }
+            System.out.print("> ");
             line = sc.nextLine();
             StringTokenizer tokens = new StringTokenizer(line, ">");
             String command = tokens.nextToken();
-            //Creo que no estamos tomando bien la subred
             String network = "";
-            if (tokens.hasMoreTokens()){
+            tokens = new StringTokenizer(command, "<");
+            if (tokens.countTokens() > 1){
+                command = tokens.nextToken();
+                command = command.replace(" ", "");
                 network = tokens.nextToken();
-                network = network.replace(">", "");
             }
             switch (command) {
                 case "stop":
@@ -140,7 +146,7 @@ public class AutonomousSystem {
                     start();
                     break;
                 default:
-                    log.info("Unknown command");
+                    System.err.println("Unknown command");
                     break;
             }
         }
@@ -152,7 +158,7 @@ public class AutonomousSystem {
     private void stop() {
         if (isOn()) {
             on = false;
-            log.info("The server has stopped");
+            System.err.println("The server has stopped");
         }
     }
 
@@ -201,7 +207,7 @@ public class AutonomousSystem {
     private void start (){
         if (!isOn()) {
             on = true;
-            log.info("The server has started");
+            System.err.println("The server has started");
         }
     }
 }
