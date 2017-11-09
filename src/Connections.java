@@ -9,6 +9,7 @@ public class Connections extends Thread {
     private Socket mini_Server;
     private boolean isOn;
     private Routes_Manager manager;
+    private Integer as_ID;
 
     private BufferedReader in;
     private PrintWriter out;
@@ -16,8 +17,8 @@ public class Connections extends Thread {
     Connections (Socket clientSocket, Routes_Manager manager) {
         this.mini_Server = clientSocket;
         this.manager = manager;
+        this.as_ID = -1;
     }
-
 
     private void manageMessages() throws IOException {
 
@@ -39,10 +40,13 @@ public class Connections extends Thread {
         }
 
         if (message == null) {
-            //this.timeout();
+            this.timeout();
         } else {
+            if (as_ID == -1){
+                as_ID = manager.getASIDFromMessage(message);
+            }
             manager.updateRoutes(message);
-            out.println(manager.routesToString());
+            out.println(manager.routesToString(as_ID));
         }
     }
 
@@ -72,13 +76,9 @@ public class Connections extends Thread {
 
     }
 
-    private void finishConnection () {
-
-        /*this.as.depositMessage("Client of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection");
-        this.as.deleteAllRoutesWithAS(this.neighborAsId);
-        this.as.depositMessage("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");*/
+    private void timeout () {
+        manager.removeRoutesFromAS(as_ID);
         this.kill();
-
     }
 
     @Override
@@ -90,7 +90,7 @@ public class Connections extends Thread {
             try {
                 this.manageMessages();
             } catch (IOException e) {
-                this.finishConnection();
+                this.timeout();
             }
 
             try {

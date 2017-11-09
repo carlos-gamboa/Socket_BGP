@@ -24,6 +24,15 @@ public class Routes_Manager {
     }
 
     /**
+     * Updates the routes multimap with the coming message
+     * @param message A string with the updated route
+     */
+    public Integer getASIDFromMessage (String message){
+        StringTokenizer tokens = new StringTokenizer(message, "*");
+        return Integer.valueOf(tokens.nextToken());
+    }
+
+    /**
      * Converts the routes multimap into a string with the specified format
      * @param neighbourAS The id of the neighbour AS
      * @return message A string with all the route information

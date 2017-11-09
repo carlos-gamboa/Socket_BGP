@@ -17,6 +17,7 @@ public class Client extends Thread {
     private BufferedReader in;
     private PrintWriter out;
     private Socket echoSocket;
+    private Integer as_ID;
 
     /**
      * Creates a client thread, to allow the AS to communicate with its neighbours
@@ -32,6 +33,7 @@ public class Client extends Thread {
         this.portNumber = client_Port;
         this.clientIsOn = true;
         routes_Manager = new Routes_Manager(id, neighbours, networks, routesMultimap);
+        this.as_ID = -1;
     }
 
     public void manageUpdateMessages() throws IOException {
@@ -55,8 +57,11 @@ public class Client extends Thread {
         }
 
         if (message == null) {
-            //this.timeout();
+            this.timeout();
         } else {
+            if (as_ID == -1){
+                as_ID = routes_Manager.getASIDFromMessage(message);
+            }
             routes_Manager.updateRoutes(message);
         }
     }
@@ -87,10 +92,8 @@ public class Client extends Thread {
 
     }
 
-    private void finishConnection () {
-        /*this.as.depositMessage("Server of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection.");
-        this.as.deleteAllRoutesWithAS(this.neighborAsId);
-        this.as.depositMessage("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");*/
+    private void timeout () {
+        routes_Manager.removeRoutesFromAS(as_ID);
         this.kill();
     }
 
