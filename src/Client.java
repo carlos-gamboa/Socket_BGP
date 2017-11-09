@@ -13,12 +13,13 @@ public class Client extends Thread {
     private String hostName; //Other AS's ip
     private int portNumber; //Port to communicate to the other AS
     private boolean clientIsOn; //To indicate if the client is active
-    private volatile Routes_Manager routes_Manager;
-    private BufferedReader in;
-    private PrintWriter out;
-    private Socket echoSocket;
-    private Integer as_ID;
-    private Integer serverAS;
+    private BufferedReader in; //To write on a socket
+    private PrintWriter out; //To read from a socket
+    private Socket echoSocket; //Client's socket
+    private volatile Routes_Manager routes_Manager; ////Instance used to update all the routes
+    private Integer as_ID; //AS's id
+    private Integer serverAS; //Server's id
+
 
     /**
      * Creates a client thread, to allow the AS to communicate with its neighbours
@@ -38,26 +39,38 @@ public class Client extends Thread {
         this.serverAS = -1;
     }
 
+    /**
+     * Manages the messages to update the routes
+     *  1- Send a message with the routes
+     *  2- Wait 30s to receive a message from the server in response
+     * @throws IOException
+     */
     public void manageUpdateMessages() throws IOException {
+        //Creates a buffer to read a message from the server socket
         if (this.in == null) {
             this.in = new BufferedReader(new InputStreamReader(this.echoSocket.getInputStream()));
         }
-
+        //Creates a buffer to write a message to the server socket
         if (this.out == null) {
             this.out = new PrintWriter(this.echoSocket.getOutputStream(), true);
         }
 
-        this.out.println(this.routes_Manager.routesToString());
+        //Sends message
+        this.out.println(this.routes_Manager.routesToString()); //Writes the routes message to the buffer
+
         String message = null;
 
+        //Obtains time
         long initialTime = System.currentTimeMillis();
         long currentTime = initialTime;
 
-        while (currentTime - initialTime <= 30000 && message == null) {
-            message = this.in.readLine();
+        //Receive message in response
+        while (currentTime - initialTime <= 30000 && message == null) { //Control time between messages
+            message = this.in.readLine(); //Reads the message from the buffer
             currentTime = System.currentTimeMillis();
         }
 
+        //If there is no message in that time the connection is lost, else the AS's routes are updated
         if (message == null) {
             this.timeout();
         } else {
@@ -69,6 +82,9 @@ public class Client extends Thread {
         }
     }
 
+    /**
+     * Closes the buffers used in the communication and close the client socket
+     */
     void kill() {
 
         if (this.in != null) {
@@ -95,13 +111,16 @@ public class Client extends Thread {
 
     }
 
+    /**
+     * Verifies the AS of the lost connection and removes all the routes which include it
+     */
     private void timeout () {
         routes_Manager.removeRoutesFromAS(as_ID);
         this.kill();
     }
 
     /**
-     * Client thread's function, sends a message each 30s to its neighbours
+     * Client thread's function, sends a message each 30s to its neighbours and receive one in response
      */
     @Override
     public void run() {

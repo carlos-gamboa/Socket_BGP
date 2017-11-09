@@ -11,12 +11,10 @@ import java.util.*;
 public class Server extends Thread {
 
     private int port; //Port to listen the neighbours
-    private volatile Routes_Manager routes_Manager;
-    private PrintWriter out;
-    private BufferedReader in;
-    private ServerSocket server;
-    private ArrayList<Connections> connections;
-    private Boolean isOn;
+    private volatile Routes_Manager routes_Manager; //Instance used to update all the routes
+    private ServerSocket server; //Server socket
+    private ArrayList<Connections> connections; //Array with all the sockets created
+    private Boolean isOn; //To indicate if the client is active
 
     /**
      * Creates a client thread, to allow the AS to communicate with its neighbours
@@ -40,6 +38,9 @@ public class Server extends Thread {
         }
     }
 
+    /**
+     * Manages the new connections, adds them to the array and start them
+     */
     private void manageConnections() {
 
         while (this.isOn) {
@@ -57,6 +58,9 @@ public class Server extends Thread {
 
     }
 
+    /**
+     * Closes the main server socket and its connections
+     */
     void kill() {
         for (Connections connection : this.connections) {
             connection.kill();
@@ -76,6 +80,9 @@ public class Server extends Thread {
 
     }
 
+    /**
+     * Main server thread, if it's on, add connections
+     */
     @Override
     public void run(){
 

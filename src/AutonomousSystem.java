@@ -32,7 +32,7 @@ public class AutonomousSystem {
 
     /**
      * Verifies if the AS is running
-     * @return on
+     * @return on True if the AS is running
      */
     private Boolean isOn () {
         return on;
@@ -41,7 +41,7 @@ public class AutonomousSystem {
     /**
      * Reads a file for create an AS
      * @param file with the AS information
-     * @return Tru if the file was opened. False if the file wasn't opened.
+     * @return True if the file was opened. False if the file wasn't opened.
      */
     private Boolean loadFile (String file) {
         int port;
@@ -68,7 +68,6 @@ public class AutonomousSystem {
                         routesMultimap.put(line, new ArrayList<>());
                         networks.add(line);
                     } else if (type == 2) {
-                        //Esto sirve solo para un vecino
                         StringTokenizer tokens = new StringTokenizer(line, ":");
                         String ip = tokens.nextToken();
                         Integer client_Port = Integer.parseInt(tokens.nextToken());
@@ -108,7 +107,7 @@ public class AutonomousSystem {
     }
 
     /**
-     * Allows th user to use specified commands on the terminal
+     * Allows the user to use specified commands on the terminal
      */
     public void startTerminal () {
         val sc = new Scanner(System.in);
@@ -163,7 +162,7 @@ public class AutonomousSystem {
 
     /**
      * Adds specified networks to the AS's known networks if the AS is running
-     * @param network
+     * @param network ip known to add to the multimap
      */
     private void add (String network) {
         if (isOn()) {

@@ -6,39 +6,53 @@ import java.net.Socket;
 
 public class Connections extends Thread {
 
-    private Socket mini_Server;
-    private boolean isOn;
-    private Routes_Manager manager;
-    private Integer as_ID;
+    private Integer as_ID; //AS's id
+    private Socket mini_Server; //Server socket created
+    private boolean isOn; //To indicate if the client is active
+    private Routes_Manager manager; //Instance used to update all the routes
+    private BufferedReader in; //To write on a socket
+    private PrintWriter out; //To read from a socket
 
-    private BufferedReader in;
-    private PrintWriter out;
-
+    /**
+     * Creates the connections of a server
+     * @param clientSocket socket to connect with the client
+     * @param manager to update the routes
+     */
     Connections (Socket clientSocket, Routes_Manager manager) {
         this.mini_Server = clientSocket;
         this.manager = manager;
         this.as_ID = -1;
     }
 
+    /**
+     * Manages messages
+     * 1- Receives a message with the routes every 30s
+     * 2- Sends one in response if it receive it
+     * @throws IOException
+     */
     private void manageMessages() throws IOException {
-
+        //Creates a buffer to read a message from the client socket
         if (this.in == null) {
             this.in = new BufferedReader(new InputStreamReader(mini_Server.getInputStream()));
         }
+        //Creates a buffer to write a message to a client socket
         if (this.out == null) {
             this.out = new PrintWriter(mini_Server.getOutputStream(), true);
         }
 
         String message = "";
 
+        //Obtains time
         long initialTime = System.currentTimeMillis();
         long currentTime = initialTime;
 
-        while (currentTime - initialTime <= 30000 && message == null) {
-            message = in.readLine();
+        //Receive message
+        while (currentTime - initialTime <= 30000 && message == null) { //Control time between messages
+            message = in.readLine(); //Reads the message with the route from the buffer
             currentTime = System.currentTimeMillis();
         }
 
+        //If there is no message in that time the connection is lost, else the routes are updated
         if (message == null) {
             this.timeout();
         } else {
@@ -47,10 +61,14 @@ public class Connections extends Thread {
                 System.err.println("AS"+as_ID+" is now connected.");
             }
             manager.updateRoutes(message);
-            out.println(manager.routesToString(as_ID));
+            //Send message
+            out.println(manager.routesToString(as_ID)); //Writes the updated routes to the buffer
         }
     }
 
+    /**
+     * Closes all the buffers used in the communication and close the mini_server socket
+     */
     void kill() {
 
         if (this.in != null) {
@@ -77,14 +95,20 @@ public class Connections extends Thread {
 
     }
 
+    /**
+     * Verifies the AS of the lost connection and and removes all the routes which include it
+     */
     private void timeout () {
-        System.err.println("AS"+as_ID+" has timed out.");
+        System.err.println("AS" + as_ID + " has timed out.");
         manager.removeRoutesFromAS(as_ID);
-        this.kill();
     }
 
+
+    /**
+     * Server thread's function, receives a message each 30s from its neighbours and respond to it
+     */
     @Override
-    public void run() {
+    public void run(){
         this.isOn = true;
 
         //this.as.depositMessage("Server with AS?? started.");
