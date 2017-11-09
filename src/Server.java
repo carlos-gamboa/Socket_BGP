@@ -50,7 +50,7 @@ public class Server extends Thread {
                 this.connections.add(connection);
                 connection.start();
             } catch (IOException e) {
-                // e.printStackTrace();
+                System.err.println("Connection couldn't be made");
             }
 
         }
@@ -58,7 +58,6 @@ public class Server extends Thread {
     }
 
     void kill() {
-
         for (Connections connection : this.connections) {
             connection.kill();
             System.err.println("Server connection: OFF");

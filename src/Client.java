@@ -18,6 +18,7 @@ public class Client extends Thread {
     private PrintWriter out;
     private Socket echoSocket;
     private Integer as_ID;
+    private Integer serverAS;
 
     /**
      * Creates a client thread, to allow the AS to communicate with its neighbours
@@ -33,7 +34,8 @@ public class Client extends Thread {
         this.portNumber = client_Port;
         this.clientIsOn = true;
         routes_Manager = new Routes_Manager(id, neighbours, networks, routesMultimap);
-        this.as_ID = -1;
+        this.as_ID = id;
+        this.serverAS = -1;
     }
 
     public void manageUpdateMessages() throws IOException {
@@ -59,8 +61,9 @@ public class Client extends Thread {
         if (message == null) {
             this.timeout();
         } else {
-            if (as_ID == -1){
-                as_ID = routes_Manager.getASIDFromMessage(message);
+            if (serverAS == -1){
+                serverAS = routes_Manager.getASIDFromMessage(message);
+                System.err.println("Connected to Server AS"+serverAS);
             }
             routes_Manager.updateRoutes(message);
         }
@@ -72,7 +75,7 @@ public class Client extends Thread {
             try {
                 this.in.close();
             } catch (IOException e) {
-                //Do nothing
+                System.err.println("Client connection couldn't be closed (input error)");
             }
         }
 
@@ -84,7 +87,7 @@ public class Client extends Thread {
             try {
                 this.echoSocket.close();
             } catch (IOException e) {
-                //Do nothing
+                System.err.println("Client connection couldn't be closed (client socket error)");
             }
         }
 

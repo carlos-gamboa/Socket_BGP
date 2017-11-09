@@ -44,6 +44,7 @@ public class Connections extends Thread {
         } else {
             if (as_ID == -1){
                 as_ID = manager.getASIDFromMessage(message);
+                System.err.println("AS"+as_ID+" is now connected.");
             }
             manager.updateRoutes(message);
             out.println(manager.routesToString(as_ID));
@@ -56,7 +57,7 @@ public class Connections extends Thread {
             try {
                 this.in.close();
             } catch (IOException e) {
-                //Do nothing
+                System.err.println("AS"+as_ID+" connection couldn't be closed (input error)");
             }
         }
 
@@ -68,7 +69,7 @@ public class Connections extends Thread {
             try {
                 this.mini_Server.close();
             } catch (IOException e) {
-                //Do nothing
+                System.err.println("AS"+as_ID+" connection couldn't be closed (client socket error)");
             }
         }
 
@@ -77,6 +78,7 @@ public class Connections extends Thread {
     }
 
     private void timeout () {
+        System.err.println("AS"+as_ID+" has timed out.");
         manager.removeRoutesFromAS(as_ID);
         this.kill();
     }
