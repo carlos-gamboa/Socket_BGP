@@ -8,10 +8,6 @@
     <artifactId>Socket_BGP</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
-    <modules>
-        <module>Server</module>
-        <module>Client</module>
-    </modules>
 
     <dependencies>
         <dependency>

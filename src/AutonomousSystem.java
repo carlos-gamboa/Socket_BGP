@@ -4,8 +4,6 @@ import com.google.common.collect.ListMultimap;
 import lombok.extern.java.Log;
 import lombok.val;
 
-import Server.Server;
-import Client.Client;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -79,7 +77,7 @@ public class AutonomousSystem {
                     }
                     else if (type == 3) {
                         port = Integer.parseInt(line);
-                        new Server(port, neighbours, networks, routesMultimap).start();
+                        new Server(id, port, neighbours, networks, routesMultimap).start();
                     }
                     else if (type == 4) {
                         id = Integer.parseInt(line);
