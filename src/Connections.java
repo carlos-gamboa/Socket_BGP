@@ -28,9 +28,9 @@ public class Connections extends Thread {
      * Manages messages
      * 1- Receives a message with the routes every 30s
      * 2- Sends one in response if it receive it
-     * @throws IOException
+     * @throws IOException, NullPointerException
      */
-    private void manageMessages() throws IOException {
+    private void manageMessages() throws IOException, NullPointerException {
         //Creates a buffer to read a message from the client socket
         if (this.in == null) {
             this.in = new BufferedReader(new InputStreamReader(mini_Server.getInputStream()));
@@ -118,6 +118,8 @@ public class Connections extends Thread {
             try {
                 this.manageMessages();
             } catch (IOException e) {
+                this.timeout();
+            } catch (NullPointerException e) {
                 this.timeout();
             }
 

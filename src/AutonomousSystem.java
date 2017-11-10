@@ -18,6 +18,8 @@ public class AutonomousSystem {
     private Boolean on; //Indicate if the AS is running
     private volatile ListMultimap<String, ArrayList<Integer>> routesMultimap; //Map that contains the network and an array with the other AS's id that are part of the route
     private int id; //Identifier of the AS
+    private ArrayList<Client> clients;
+    private ArrayList<Server> servers;
 
     /**
      * Creates an AutonomousSystem
@@ -27,6 +29,8 @@ public class AutonomousSystem {
         networks = new ArrayList<>();
         neighbours = new HashMap<>();
         routesMultimap = ArrayListMultimap.create();
+        clients = new ArrayList<>();
+        servers = new ArrayList<>();
         System.out.println("The server is running.");
     }
 
@@ -72,11 +76,11 @@ public class AutonomousSystem {
                         String ip = tokens.nextToken();
                         Integer client_Port = Integer.parseInt(tokens.nextToken());
                         neighbours.put(ip, client_Port);
-                        new Client(id, ip, client_Port, neighbours, networks, routesMultimap).start();
+                        clients.add(new Client(id, ip, client_Port, neighbours, networks, routesMultimap));
                     }
                     else if (type == 3) {
                         port = Integer.parseInt(line);
-                        new Server(id, port, neighbours, networks, routesMultimap).start();
+                        servers.add(new Server(id, port, neighbours, networks, routesMultimap));
                     }
                     else if (type == 4) {
                         id = Integer.parseInt(line);
@@ -157,6 +161,12 @@ public class AutonomousSystem {
         if (isOn()) {
             on = false;
             System.err.println("The server has stopped");
+            for (int i = 0; i < clients.size(); ++i) {
+                clients.get(i).kill();
+            }
+            for (int i = 0; i < servers.size(); ++i) {
+                servers.get(i).kill();
+            }
         }
     }
 
@@ -205,8 +215,14 @@ public class AutonomousSystem {
      */
     private void start (){
         if (!isOn()) {
-            on = true;
             System.err.println("The server has started");
+            on = true;
+            for (int i = 0; i < clients.size(); ++i) {
+                clients.get(i).start();
+            }
+            for (int i = 0; i < servers.size(); ++i) {
+                servers.get(i).start();
+            }
         }
     }
 }
