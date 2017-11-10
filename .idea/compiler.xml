@@ -5,7 +5,7 @@
       <profile default="true" name="Default" enabled="true" />
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
-      <module name="Socket_BGP" target="1.5" />
+      <module name="Socket_BGP" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

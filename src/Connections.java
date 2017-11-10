@@ -47,7 +47,7 @@ public class Connections extends Thread {
         long currentTime = initialTime;
 
         //Receive message
-        while (currentTime - initialTime <= 30000 && message == null) { //Control time between messages
+        while (currentTime - initialTime <= 30000 && message.equals("")) { //Control time between messages
             message = in.readLine(); //Reads the message with the route from the buffer
             currentTime = System.currentTimeMillis();
         }
@@ -62,6 +62,7 @@ public class Connections extends Thread {
             }
             manager.updateRoutes(message);
             //Send message
+            String temporal = manager.routesToString();
             out.println(manager.routesToString(as_ID)); //Writes the updated routes to the buffer
         }
     }
@@ -101,6 +102,7 @@ public class Connections extends Thread {
     private void timeout () {
         System.err.println("AS" + as_ID + " has timed out.");
         manager.removeRoutesFromAS(as_ID);
+        kill();
     }
 
 

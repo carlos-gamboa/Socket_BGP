@@ -56,16 +56,21 @@ public class Client extends Thread {
         }
 
         //Sends message
-        this.out.println(this.routes_Manager.routesToString()); //Writes the routes message to the buffer
+        if (serverAS == -1) {
+            this.out.println(this.routes_Manager.routesToString()); //Writes the routes message to the buffer
+        }
+        else {
+            this.out.println(this.routes_Manager.routesToString(serverAS)); //Writes the routes message to the buffer
+        }
 
-        String message = null;
+        String message = "";
 
         //Obtains time
         long initialTime = System.currentTimeMillis();
         long currentTime = initialTime;
 
         //Receive message in response
-        while (currentTime - initialTime <= 30000 && message == null) { //Control time between messages
+        while (currentTime - initialTime <= 30000 && message.equals("")) { //Control time between messages
             message = this.in.readLine(); //Reads the message from the buffer
             currentTime = System.currentTimeMillis();
         }
@@ -115,6 +120,7 @@ public class Client extends Thread {
      * Verifies the AS of the lost connection and removes all the routes which include it
      */
     private void timeout () {
+        System.err.println("AS" + serverAS + " has timed out.");
         routes_Manager.removeRoutesFromAS(as_ID);
         this.kill();
     }

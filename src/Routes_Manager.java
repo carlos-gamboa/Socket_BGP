@@ -43,7 +43,10 @@ public class Routes_Manager {
             Collection<ArrayList<Integer>> values = routesMultimap.get(key); //Set of all the routes for each network
             for (Iterator<ArrayList<Integer>> iterator = values.iterator(); iterator.hasNext();) { //Iterates over the set of routes
                 ArrayList<Integer> route = iterator.next();
-                if (route.get(0) == neighbourAS){ //?
+                if (route.isEmpty()){
+                    message = message + key + ":AS" + as_ID + ",";
+                }
+                else if (route.get(0) != neighbourAS){ //?
                     message = message + key + ":" + arrayToString(route) + ",";
                 }
             }
@@ -72,7 +75,7 @@ public class Routes_Manager {
      * @param routes The route array with the AS's id
      * @return result A string with the route
      */
-    private String arrayToString(ArrayList<Integer> routes) {
+    private synchronized String arrayToString(ArrayList<Integer> routes) {
         String result = "AS" + as_ID;
         for (int i = 0; i < routes.size(); ++i) { //Iterates over the routes array
             result = result + "-AS" + String.valueOf(routes.get(i)); //Add each AS's id
@@ -85,13 +88,23 @@ public class Routes_Manager {
      * @param as The AS's id
      */
     public synchronized void removeRoutesFromAS(Integer as){
-        for (String key : routesMultimap.keySet()) { //Iterates over the networks
-            Collection<ArrayList<Integer>> values = routesMultimap.get(key); //Set of all the routes for each network
-            for (Iterator<ArrayList<Integer>> iterator = values.iterator(); iterator.hasNext();) { //Iterates over the set of routes
+        String realKey = "";
+        Iterator<String> key = routesMultimap.keySet().iterator();
+        while (key.hasNext()) { //Iterates over the networks
+            realKey = key.next();
+            Collection<ArrayList<Integer>> values = routesMultimap.get(realKey); //Set of all the routes for each network
+            for (Iterator<ArrayList<Integer>> iterator = values.iterator(); iterator.hasNext();) { //Iterates over the set of routesC:\Users\Dell\Documents\Universidad\Redes de Computadores\Socket_BGP\src
                 ArrayList<Integer> route = iterator.next();
                 if (!route.isEmpty()){
                     if (route.get(0) == as){ //If the route contains the specified AS, remove it
-                        routesMultimap.remove(key, route);
+                        //routesMultimap.remove(key, route);
+                        if (route.size() == 1) {
+                            key.remove();
+                            break;
+                        }
+                        else {
+                            iterator.remove();
+                        }
                     }
                 }
             }
@@ -103,7 +116,7 @@ public class Routes_Manager {
      * @param routes String with the specified format of a route
      * @return routes_array An array with the route
      */
-    public ArrayList<Integer> routeStringToArray (String routes){
+    public synchronized ArrayList<Integer> routeStringToArray (String routes){
         ArrayList<Integer> routes_Array = new ArrayList<>();
         StringTokenizer routesTokens = new StringTokenizer(routes, "-");
         while(routesTokens.hasMoreTokens()){
