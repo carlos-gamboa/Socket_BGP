@@ -98,7 +98,7 @@ public class Routes_Manager {
                 if (!route.isEmpty()){
                     if (route.get(0) == as){ //If the route contains the specified AS, remove it
                         //routesMultimap.remove(key, route);
-                        if (route.size() == 1) {
+                        if (!iterator.hasNext()) {
                             key.remove();
                             break;
                         }

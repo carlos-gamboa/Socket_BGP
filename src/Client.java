@@ -19,7 +19,7 @@ public class Client extends Thread {
     private volatile Routes_Manager routes_Manager; ////Instance used to update all the routes
     private Integer as_ID; //AS's id
     private Integer serverAS; //Server's id
-    private PrintWriter log_file;
+    private File_Manager log_file;
 
 
     /**
@@ -31,7 +31,7 @@ public class Client extends Thread {
      * @param networks Array with the AS's known networks
      * @param routesMultimap Map that contains the network and an array with the other AS's id that are part of the route
      */
-    public Client (Integer id, String ip, Integer client_Port, Map<String, Integer> neighbours, ArrayList<String>  networks, ListMultimap<String, ArrayList<Integer>> routesMultimap, PrintWriter log_file) {
+    public Client (Integer id, String ip, Integer client_Port, Map<String, Integer> neighbours, ArrayList<String>  networks, ListMultimap<String, ArrayList<Integer>> routesMultimap, File_Manager log_file) {
         this.hostName = ip;
         this.portNumber = client_Port;
         this.clientIsOn = true;
@@ -99,7 +99,7 @@ public class Client extends Thread {
                 this.in.close();
             } catch (IOException e) {
                 System.err.println("Client connection couldn't be closed (input error)");
-                log_file.println("Client connection couldn't be closed (input error).");
+                log_file.writeToFile("Client connection couldn't be closed (input error).");
             }
         }
 
@@ -112,7 +112,7 @@ public class Client extends Thread {
                 this.echoSocket.close();
             } catch (IOException e) {
                 System.err.println("Client connection couldn't be closed (client socket error)");
-                log_file.println("Client connection couldn't be closed (client socket error).");
+                log_file.writeToFile("Client connection couldn't be closed (client socket error).");
             }
         }
 
@@ -125,7 +125,9 @@ public class Client extends Thread {
      */
     private void timeout () {
         System.err.println("AS" + serverAS + " has timed out.");
-        routes_Manager.removeRoutesFromAS(as_ID);
+        if (serverAS != -1) {
+            routes_Manager.removeRoutesFromAS(serverAS);
+        }
         this.kill();
     }
 
@@ -142,12 +144,12 @@ public class Client extends Thread {
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
-            log_file.println("Don't know about host " + hostName + ".");
-            System.exit(1);
+            log_file.writeToFile("Don't know about host " + hostName + ".");
+            timeout();
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to " + hostName);
-            log_file.println("Couldn't get I/O for the connection to " + hostName + ".");
-            System.exit(1);
+            log_file.writeToFile("Couldn't get I/O for the connection to " + hostName + ".");
+            timeout();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
