@@ -8,6 +8,8 @@ public class Routes_Manager {
     private ListMultimap<String, ArrayList<Integer>> routesMultimap; //Map that contains the network and an array with the other AS's id that are part of the route
     private Integer as_ID; //Identifier of the AS
     private String hostName; //Other AS's ip
+    private ArrayList<String> keysToDelete;
+    private ArrayList<ArrayList<Integer>> valuesToDelete;
 
     /**
      * Creates a Route Manager to manage the updates.
@@ -21,6 +23,8 @@ public class Routes_Manager {
         this.networks = networks;
         this.routesMultimap = routesMultimap;
         this.as_ID = id;
+        this.keysToDelete = new ArrayList<>();
+        this.valuesToDelete = new ArrayList<>();
     }
 
     /**
@@ -46,7 +50,7 @@ public class Routes_Manager {
                 if (route.isEmpty()){
                     message = message + key + ":AS" + as_ID + ",";
                 }
-                else if (route.get(0) != neighbourAS){ //?
+                else if (!route.contains(neighbourAS)){
                     message = message + key + ":" + arrayToString(route) + ",";
                 }
             }
@@ -88,6 +92,8 @@ public class Routes_Manager {
      * @param as The AS's id
      */
     public synchronized void removeRoutesFromAS(Integer as){
+        keysToDelete.clear();
+        valuesToDelete.clear();
         String realKey = "";
         Iterator<String> key = routesMultimap.keySet().iterator();
         while (key.hasNext()) { //Iterates over the networks
@@ -97,17 +103,14 @@ public class Routes_Manager {
                 ArrayList<Integer> route = iterator.next();
                 if (!route.isEmpty()){
                     if (route.get(0) == as){ //If the route contains the specified AS, remove it
-                        //routesMultimap.remove(key, route);
-                        if (!iterator.hasNext()) {
-                            key.remove();
-                            break;
-                        }
-                        else {
-                            iterator.remove();
-                        }
+                        keysToDelete.add(realKey);
+                        valuesToDelete.add(route);
                     }
                 }
             }
+        }
+        for (int i = 0; i < keysToDelete.size(); ++i){
+            routesMultimap.remove(keysToDelete.get(i), valuesToDelete.get(i));
         }
     }
 
