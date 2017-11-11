@@ -21,7 +21,7 @@ public class AutonomousSystem {
     private int id; //Identifier of the AS
     private ArrayList<Client> clients;
     private ArrayList<Server> servers;
-    private volatile PrintWriter log_file;
+    private volatile File_Manager log_file;
 
     /**
      * Creates an AutonomousSystem
@@ -86,7 +86,7 @@ public class AutonomousSystem {
                     }
                     else if (type == 4) {
                         id = Integer.parseInt(line);
-                        log_file = new PrintWriter("log-AS" + id + ".txt", "UTF-8");
+                        log_file = new File_Manager(id);
                     }
                 }
                 line = br.readLine();
@@ -95,7 +95,6 @@ public class AutonomousSystem {
         }
         catch (IOException e) {
             System.out.print("File not found. Enter AS information filename: ");
-            log_file.println("File not found.");
             return false;
         }
         return true;
@@ -126,7 +125,6 @@ public class AutonomousSystem {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 System.err.println("Error in the terminal.");
-                log_file.println("Error in the terminal.");
             }
             System.out.print("> ");
             line = sc.nextLine();
@@ -154,7 +152,7 @@ public class AutonomousSystem {
                     break;
                 default:
                     System.err.println("Unknown command");
-                    log_file.println("Unknown command.");
+                    log_file.writeToFile("Unknown command.");
                     break;
             }
         }
@@ -173,7 +171,7 @@ public class AutonomousSystem {
             for (int i = 0; i < servers.size(); ++i) {
                 servers.get(i).kill();
             }
-            log_file.close();
+            log_file.closeFile();
             System.exit(1);
         }
     }

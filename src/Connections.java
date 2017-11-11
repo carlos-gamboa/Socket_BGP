@@ -12,14 +12,14 @@ public class Connections extends Thread {
     private Routes_Manager manager; //Instance used to update all the routes
     private BufferedReader in; //To write on a socket
     private PrintWriter out; //To read from a socket
-    private PrintWriter log_file;
+    private File_Manager log_file;
 
     /**
      * Creates the connections of a server
      * @param clientSocket socket to connect with the client
      * @param manager to update the routes
      */
-    Connections (Socket clientSocket, Routes_Manager manager, PrintWriter log_file) {
+    Connections (Socket clientSocket, Routes_Manager manager, File_Manager log_file) {
         this.mini_Server = clientSocket;
         this.manager = manager;
         this.as_ID = -1;
@@ -79,7 +79,7 @@ public class Connections extends Thread {
                 this.in.close();
             } catch (IOException e) {
                 System.err.println("AS"+as_ID+" connection couldn't be closed (input error)");
-                log_file.println("AS"+as_ID+" connection couldn't be closed (input error).");
+                log_file.writeToFile("AS"+as_ID+" connection couldn't be closed (input error).");
             }
         }
 
@@ -92,7 +92,7 @@ public class Connections extends Thread {
                 this.mini_Server.close();
             } catch (IOException e) {
                 System.err.println("AS"+as_ID+" connection couldn't be closed (client socket error).");
-                log_file.println("AS"+as_ID+" connection couldn't be closed (client socket error).");
+                log_file.writeToFile("AS"+as_ID+" connection couldn't be closed (client socket error).");
             }
         }
 
@@ -105,7 +105,7 @@ public class Connections extends Thread {
      */
     private void timeout () {
         System.err.println("AS" + as_ID + " has timed out.");
-        log_file.println("AS" + as_ID + " has timed out.");
+        log_file.writeToFile("AS" + as_ID + " has timed out.");
         if (as_ID != -1) {
             manager.removeRoutesFromAS(as_ID);
         }

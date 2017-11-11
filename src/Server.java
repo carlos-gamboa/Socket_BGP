@@ -15,7 +15,7 @@ public class Server extends Thread {
     private ServerSocket server; //Server socket
     private ArrayList<Connections> connections; //Array with all the sockets created
     private Boolean isOn; //To indicate if the client is active
-    private PrintWriter log_file;
+    private File_Manager log_file;
 
     /**
      * Creates a client thread, to allow the AS to communicate with its neighbours
@@ -26,7 +26,7 @@ public class Server extends Thread {
      * @param networks       Array with the AS's known networks
      * @param routesMultimap Map that contains the network and an array with the other AS's id that are part of the route
      */
-    public Server(Integer id, Integer port, Map<String, Integer> neighbours, ArrayList<String> networks, ListMultimap<String, ArrayList<Integer>> routesMultimap, PrintWriter log_file) {
+    public Server(Integer id, Integer port, Map<String, Integer> neighbours, ArrayList<String> networks, ListMultimap<String, ArrayList<Integer>> routesMultimap, File_Manager log_file) {
         routes_Manager = new Routes_Manager(id, neighbours, networks, routesMultimap);
         this.port = port;
 
@@ -38,7 +38,7 @@ public class Server extends Thread {
             this.server = new ServerSocket(port);
         } catch (IOException e) {
             System.err.println("Couldn't create server socket.");
-            log_file.println("Couldn't create server socket.");
+            log_file.writeToFile("Couldn't create server socket.");
         }
     }
 
@@ -56,7 +56,7 @@ public class Server extends Thread {
                 connection.start();
             } catch (IOException e) {
                 System.err.println("Finished connection.");
-                log_file.println("Finished connection.");
+                log_file.writeToFile("Finished connection.");
             }
 
         }
@@ -70,7 +70,7 @@ public class Server extends Thread {
         for (Connections connection : this.connections) {
             connection.kill();
             System.err.println("Server connection: OFF");
-            log_file.println("Server connection: OFF.");
+            log_file.writeToFile("Server connection: OFF.");
         }
 
         this.isOn = false;
@@ -81,7 +81,7 @@ public class Server extends Thread {
                 closed = true;
             } catch (IOException e) {
                 System.err.println("Couldn't close the server socket, retrying...");
-                log_file.println("Couldn't close the server socket.");
+                log_file.writeToFile("Couldn't close the server socket.");
             }
         }
 
