@@ -31,11 +31,11 @@ public class Client extends Thread {
      * @param networks Array with the AS's known networks
      * @param routesMultimap Map that contains the network and an array with the other AS's id that are part of the route
      */
-    public Client (Integer id, String ip, Integer client_Port, Map<String, Integer> neighbours, ArrayList<String>  networks, ListMultimap<String, ArrayList<Integer>> routesMultimap, File_Manager log_file) {
+    public Client (Integer id, String ip, Integer client_Port, Map<String, Integer> neighbours, ArrayList<String>  networks, ListMultimap<String, ArrayList<Integer>> routesMultimap, File_Manager log_file, Map<String, Integer> shortestRoutes) {
         this.hostName = ip;
         this.portNumber = client_Port;
         this.clientIsOn = true;
-        routes_Manager = new Routes_Manager(id, neighbours, networks, routesMultimap);
+        routes_Manager = new Routes_Manager(id, neighbours, networks, routesMultimap, shortestRoutes);
         this.as_ID = id;
         this.serverAS = -1;
         this.log_file = log_file;

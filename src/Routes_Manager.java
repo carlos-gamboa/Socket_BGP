@@ -4,6 +4,7 @@ import java.util.*;
 
 public class Routes_Manager {
     private Map<String, Integer> neighbours; //Map that contains the associated AS's and the port for each one
+    private Map<String, Integer> shortestRoutes;
     private ArrayList<String> networks; //Array with the AS's known networks
     private ListMultimap<String, ArrayList<Integer>> routesMultimap; //Map that contains the network and an array with the other AS's id that are part of the route
     private Integer as_ID; //Identifier of the AS
@@ -18,11 +19,12 @@ public class Routes_Manager {
      * @param networks Array with the AS's known networks
      * @param routesMultimap Map that contains the network and an array with the other AS's id that are part of the route
      */
-    public Routes_Manager (Integer id, Map<String, Integer> neighbours, ArrayList<String>  networks, ListMultimap<String, ArrayList<Integer>> routesMultimap) {
+    public Routes_Manager (Integer id, Map<String, Integer> neighbours, ArrayList<String>  networks, ListMultimap<String, ArrayList<Integer>> routesMultimap, Map<String, Integer> shortestRoutes) {
         this.neighbours = neighbours;
         this.networks = networks;
         this.routesMultimap = routesMultimap;
         this.as_ID = id;
+        this.shortestRoutes = shortestRoutes;
         this.keysToDelete = new ArrayList<>();
         this.valuesToDelete = new ArrayList<>();
     }
@@ -147,7 +149,11 @@ public class Routes_Manager {
                 StringTokenizer routesToken = new StringTokenizer(routes, ":");
                 String route_IP = routesToken.nextToken();
                 String routes_From_IP = routesToken.nextToken();
-                routesMultimap.put(route_IP, routeStringToArray(routes_From_IP));
+                ArrayList<Integer> routesArray = routeStringToArray(routes_From_IP);
+                routesMultimap.put(route_IP, routesArray);
+                if (!shortestRoutes.containsKey(route_IP) || shortestRoutes.get(route_IP) > routesArray.size()) {
+                    shortestRoutes.put(route_IP, routesArray.size());
+                }
             }
         }
     }

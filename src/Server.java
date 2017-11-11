@@ -26,8 +26,8 @@ public class Server extends Thread {
      * @param networks       Array with the AS's known networks
      * @param routesMultimap Map that contains the network and an array with the other AS's id that are part of the route
      */
-    public Server(Integer id, Integer port, Map<String, Integer> neighbours, ArrayList<String> networks, ListMultimap<String, ArrayList<Integer>> routesMultimap, File_Manager log_file) {
-        routes_Manager = new Routes_Manager(id, neighbours, networks, routesMultimap);
+    public Server(Integer id, Integer port, Map<String, Integer> neighbours, ArrayList<String> networks, ListMultimap<String, ArrayList<Integer>> routesMultimap, File_Manager log_file, Map<String, Integer> shortestRoutes) {
+        routes_Manager = new Routes_Manager(id, neighbours, networks, routesMultimap, shortestRoutes);
         this.port = port;
 
         this.connections = new ArrayList<>();

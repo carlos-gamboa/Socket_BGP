@@ -15,6 +15,7 @@ import java.util.*;
 public class AutonomousSystem {
 
     private volatile Map<String, Integer> neighbours; //Map that contains the associated AS's and the port for each one
+    private volatile Map<String, Integer> shortestRoutes;
     private volatile ArrayList<String> networks; //Array with the AS's known networks
     private Boolean on; //Indicate if the AS is running
     private volatile ListMultimap<String, ArrayList<Integer>> routesMultimap; //Map that contains the network and an array with the other AS's id that are part of the route
@@ -30,6 +31,7 @@ public class AutonomousSystem {
         on = false;
         networks = new ArrayList<>();
         neighbours = new HashMap<>();
+        shortestRoutes = new HashMap<>();
         routesMultimap = ArrayListMultimap.create();
         clients = new ArrayList<>();
         servers = new ArrayList<>();
@@ -73,16 +75,17 @@ public class AutonomousSystem {
                     if(type == 1){
                         routesMultimap.put(line, new ArrayList<>());
                         networks.add(line);
+                        shortestRoutes.put(line, 0);
                     } else if (type == 2) {
                         StringTokenizer tokens = new StringTokenizer(line, ":");
                         String ip = tokens.nextToken();
                         Integer client_Port = Integer.parseInt(tokens.nextToken());
                         neighbours.put(ip, client_Port);
-                        clients.add(new Client(id, ip, client_Port, neighbours, networks, routesMultimap, log_file));
+                        clients.add(new Client(id, ip, client_Port, neighbours, networks, routesMultimap, log_file, shortestRoutes));
                     }
                     else if (type == 3) {
                         port = Integer.parseInt(line);
-                        servers.add(new Server(id, port, neighbours, networks, routesMultimap, log_file));
+                        servers.add(new Server(id, port, neighbours, networks, routesMultimap, log_file, shortestRoutes));
                     }
                     else if (type == 4) {
                         id = Integer.parseInt(line);
@@ -182,8 +185,11 @@ public class AutonomousSystem {
      */
     private void add (String network) {
         if (isOn()) {
-            routesMultimap.put(network, new ArrayList<>());
-            networks.add(network);
+            if (!networks.contains(network)){
+                routesMultimap.put(network, new ArrayList<>());
+                networks.add(network);
+                shortestRoutes.put(network, 0);
+            }
         }
     }
 
@@ -192,9 +198,17 @@ public class AutonomousSystem {
      */
     private void show_Route() {
         if (isOn()) {
+            Boolean shortest;
             for (String key : routesMultimap.keySet()) { //Iterate over the networks
+                shortest = false;
                 for (ArrayList<Integer> value : routesMultimap.get(key)) { //Iterate over the routes array of each network
-                    System.out.println("Red " + key + ": " + routesArrayToString(value));
+                    if (!shortest && value.size() == shortestRoutes.get(key)) {
+                        System.out.println("*** Red " + key + ": " + routesArrayToString(value));
+                        shortest = true;
+                    }
+                    else {
+                        System.out.println("Red " + key + ": " + routesArrayToString(value));
+                    }
                 }
             }
         }
