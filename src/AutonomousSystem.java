@@ -174,6 +174,7 @@ public class AutonomousSystem {
                 servers.get(i).kill();
             }
             log_file.close();
+            System.exit(1);
         }
     }
 

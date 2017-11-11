@@ -125,7 +125,9 @@ public class Client extends Thread {
      */
     private void timeout () {
         System.err.println("AS" + serverAS + " has timed out.");
-        routes_Manager.removeRoutesFromAS(as_ID);
+        if (serverAS != -1) {
+            routes_Manager.removeRoutesFromAS(serverAS);
+        }
         this.kill();
     }
 
@@ -143,11 +145,11 @@ public class Client extends Thread {
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             log_file.println("Don't know about host " + hostName + ".");
-            System.exit(1);
+            timeout();
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to " + hostName);
             log_file.println("Couldn't get I/O for the connection to " + hostName + ".");
-            System.exit(1);
+            timeout();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

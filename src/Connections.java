@@ -106,7 +106,9 @@ public class Connections extends Thread {
     private void timeout () {
         System.err.println("AS" + as_ID + " has timed out.");
         log_file.println("AS" + as_ID + " has timed out.");
-        manager.removeRoutesFromAS(as_ID);
+        if (as_ID != -1) {
+            manager.removeRoutesFromAS(as_ID);
+        }
         kill();
     }
 
