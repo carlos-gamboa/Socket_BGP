@@ -6,4 +6,4 @@
 #Vecinos BGP
 127.0.0.01:5555
 #Escuchar vecinos
-8080
+3333
