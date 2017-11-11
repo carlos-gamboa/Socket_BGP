@@ -8,6 +8,7 @@ import lombok.val;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 @Log
@@ -20,6 +21,7 @@ public class AutonomousSystem {
     private int id; //Identifier of the AS
     private ArrayList<Client> clients;
     private ArrayList<Server> servers;
+    private volatile PrintWriter log_file;
 
     /**
      * Creates an AutonomousSystem
@@ -76,14 +78,15 @@ public class AutonomousSystem {
                         String ip = tokens.nextToken();
                         Integer client_Port = Integer.parseInt(tokens.nextToken());
                         neighbours.put(ip, client_Port);
-                        clients.add(new Client(id, ip, client_Port, neighbours, networks, routesMultimap));
+                        clients.add(new Client(id, ip, client_Port, neighbours, networks, routesMultimap, log_file));
                     }
                     else if (type == 3) {
                         port = Integer.parseInt(line);
-                        servers.add(new Server(id, port, neighbours, networks, routesMultimap));
+                        servers.add(new Server(id, port, neighbours, networks, routesMultimap, log_file));
                     }
                     else if (type == 4) {
                         id = Integer.parseInt(line);
+                        log_file = new PrintWriter("log-AS" + id + ".txt", "UTF-8");
                     }
                 }
                 line = br.readLine();
@@ -92,6 +95,7 @@ public class AutonomousSystem {
         }
         catch (IOException e) {
             System.out.print("File not found. Enter AS information filename: ");
+            log_file.println("File not found.");
             return false;
         }
         return true;
@@ -121,7 +125,8 @@ public class AutonomousSystem {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                System.err.println("Error en la terminal.");
+                System.err.println("Error in the terminal.");
+                log_file.println("Error in the terminal.");
             }
             System.out.print("> ");
             line = sc.nextLine();
@@ -149,6 +154,7 @@ public class AutonomousSystem {
                     break;
                 default:
                     System.err.println("Unknown command");
+                    log_file.println("Unknown command.");
                     break;
             }
         }
@@ -167,6 +173,7 @@ public class AutonomousSystem {
             for (int i = 0; i < servers.size(); ++i) {
                 servers.get(i).kill();
             }
+            log_file.close();
         }
     }
 

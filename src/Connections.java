@@ -12,16 +12,18 @@ public class Connections extends Thread {
     private Routes_Manager manager; //Instance used to update all the routes
     private BufferedReader in; //To write on a socket
     private PrintWriter out; //To read from a socket
+    private PrintWriter log_file;
 
     /**
      * Creates the connections of a server
      * @param clientSocket socket to connect with the client
      * @param manager to update the routes
      */
-    Connections (Socket clientSocket, Routes_Manager manager) {
+    Connections (Socket clientSocket, Routes_Manager manager, PrintWriter log_file) {
         this.mini_Server = clientSocket;
         this.manager = manager;
         this.as_ID = -1;
+        this.log_file = log_file;
     }
 
     /**
@@ -77,6 +79,7 @@ public class Connections extends Thread {
                 this.in.close();
             } catch (IOException e) {
                 System.err.println("AS"+as_ID+" connection couldn't be closed (input error)");
+                log_file.println("AS"+as_ID+" connection couldn't be closed (input error).");
             }
         }
 
@@ -88,7 +91,8 @@ public class Connections extends Thread {
             try {
                 this.mini_Server.close();
             } catch (IOException e) {
-                System.err.println("AS"+as_ID+" connection couldn't be closed (client socket error)");
+                System.err.println("AS"+as_ID+" connection couldn't be closed (client socket error).");
+                log_file.println("AS"+as_ID+" connection couldn't be closed (client socket error).");
             }
         }
 
@@ -101,6 +105,7 @@ public class Connections extends Thread {
      */
     private void timeout () {
         System.err.println("AS" + as_ID + " has timed out.");
+        log_file.println("AS" + as_ID + " has timed out.");
         manager.removeRoutesFromAS(as_ID);
         kill();
     }
