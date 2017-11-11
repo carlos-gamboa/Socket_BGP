@@ -1,0 +1,10 @@
+#ID
+4
+#Redes conocidas
+24.10.0.1
+250.120.1.1
+#Vecinos BGP
+127.0.0.01:5555
+127.0.0.01:3333
+#Escuchar vecinos
+4444

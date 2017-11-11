@@ -1,0 +1,9 @@
+#ID
+2
+#Redes conocidas
+230.9.0.0
+12.111.3.0
+#Vecinos BGP
+127.0.0.01:5555
+#Escuchar vecinos
+3333
