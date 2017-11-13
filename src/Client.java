@@ -128,7 +128,6 @@ public class Client extends Thread {
         if (serverAS != -1) {
             routes_Manager.removeRoutesFromAS(serverAS);
         }
-        this.kill();
     }
 
     /**
@@ -136,22 +135,28 @@ public class Client extends Thread {
      */
     @Override
     public void run() {
-        try {
-            this.echoSocket = new Socket(hostName, portNumber);
-            while (clientIsOn) {
-                manageUpdateMessages();
-                Thread.sleep(20000); //wait 20s
+        while (true) {
+            try {
+                this.in = null;
+                this.out = null;
+                this.serverAS = -1;
+                this.echoSocket = new Socket(hostName, portNumber);
+                while (clientIsOn) {
+                    manageUpdateMessages();
+                    Thread.sleep(20000); //wait 20s
+                }
+            } catch (UnknownHostException e) {
+                timeout();
+            } catch (IOException e) {
+                timeout();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (UnknownHostException e) {
-            System.err.println("Don't know about host " + hostName);
-            log_file.writeToFile("Don't know about host " + hostName + ".");
-            timeout();
-        } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to " + hostName);
-            log_file.writeToFile("Couldn't get I/O for the connection to " + hostName + ".");
-            timeout();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            try {
+                Thread.sleep(20000); //wait 20s
+            }  catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
