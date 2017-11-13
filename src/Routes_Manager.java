@@ -35,7 +35,9 @@ public class Routes_Manager {
      */
     public Integer getASIDFromMessage (String message){
         StringTokenizer tokens = new StringTokenizer(message, "*");
-        return Integer.valueOf(tokens.nextToken());
+        String asID = tokens.nextToken();
+        asID = asID.replace("AS", "");
+        return Integer.valueOf(asID);
     }
 
     /**
@@ -44,7 +46,7 @@ public class Routes_Manager {
      * @return message A string with all the route information
      */
     public synchronized String routesToString(Integer neighbourAS) {
-        String message = String.valueOf(as_ID) + "*"; //Concatenate the AS's id
+        String message = "AS" + String.valueOf(as_ID) + "*"; //Concatenate the AS's id
         for (String key : routesMultimap.keySet()) { //Iterates over the networks
             Collection<ArrayList<Integer>> values = routesMultimap.get(key); //Set of all the routes for each network
             for (Iterator<ArrayList<Integer>> iterator = values.iterator(); iterator.hasNext();) { //Iterates over the set of routes
@@ -65,7 +67,7 @@ public class Routes_Manager {
      * @return message A string with all the route information
      */
     public synchronized String routesToString() {
-        String message = String.valueOf(as_ID) + "*"; //Concatenate the AS's id
+        String message = "AS" + String.valueOf(as_ID) + "*"; //Concatenate the AS's id
         for (String key : routesMultimap.keySet()) { //Iterates over the networks
             Collection<ArrayList<Integer>> values = routesMultimap.get(key); //Set of all the routes for each network
             for (Iterator<ArrayList<Integer>> iterator = values.iterator(); iterator.hasNext();) {  //Iterates over the set of routes
@@ -139,6 +141,7 @@ public class Routes_Manager {
     public synchronized void updateRoutes(String message){
         StringTokenizer tokens = new StringTokenizer(message, "*");
         String as_ID = tokens.nextToken();
+        as_ID = as_ID.replace("AS", "");
         removeRoutesFromAS(Integer.parseInt(as_ID));
         if (tokens.hasMoreTokens()) {
             String other = tokens.nextToken();
