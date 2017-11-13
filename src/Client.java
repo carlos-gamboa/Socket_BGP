@@ -1,9 +1,6 @@
 import com.google.common.collect.ListMultimap;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -13,8 +10,8 @@ public class Client extends Thread {
     private String hostName; //Other AS's ip
     private int portNumber; //Port to communicate to the other AS
     private boolean clientIsOn; //To indicate if the client is active
-    private BufferedReader in; //To write on a socket
-    private PrintWriter out; //To read from a socket
+    private DataInputStream in; //To write on a socket
+    private DataOutputStream out; //To read from a socket
     private Socket echoSocket; //Client's socket
     private volatile Routes_Manager routes_Manager; ////Instance used to update all the routes
     private Integer as_ID; //AS's id
@@ -50,19 +47,19 @@ public class Client extends Thread {
     public void manageUpdateMessages() throws IOException {
         //Creates a buffer to read a message from the server socket
         if (this.in == null) {
-            this.in = new BufferedReader(new InputStreamReader(this.echoSocket.getInputStream()));
+            this.in = new DataInputStream(this.echoSocket.getInputStream());
         }
         //Creates a buffer to write a message to the server socket
         if (this.out == null) {
-            this.out = new PrintWriter(this.echoSocket.getOutputStream(), true);
+            this.out = new DataOutputStream(this.echoSocket.getOutputStream());
         }
 
         //Sends message
         if (serverAS == -1) {
-            this.out.println(this.routes_Manager.routesToString()); //Writes the routes message to the buffer
+            this.out.writeUTF(this.routes_Manager.routesToString()); //Writes the routes message to the buffer
         }
         else {
-            this.out.println(this.routes_Manager.routesToString(serverAS)); //Writes the routes message to the buffer
+            this.out.writeUTF(this.routes_Manager.routesToString(serverAS)); //Writes the routes message to the buffer
         }
 
         String message = "";
@@ -73,7 +70,7 @@ public class Client extends Thread {
 
         //Receive message in response
         while (currentTime - initialTime <= 30000 && message.equals("")) { //Control time between messages
-            message = this.in.readLine(); //Reads the message from the buffer
+            message = this.in.readUTF(); //Reads the message from the buffer
             currentTime = System.currentTimeMillis();
         }
 
@@ -104,7 +101,11 @@ public class Client extends Thread {
         }
 
         if (this.out != null) {
-            this.out.close();
+            try {
+                this.out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         if (this.echoSocket != null) {
