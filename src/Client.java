@@ -124,9 +124,14 @@ public class Client extends Thread {
      * Verifies the AS of the lost connection and removes all the routes which include it
      */
     private void timeout () {
-        System.err.println("AS" + serverAS + " has timed out.");
-        if (serverAS != -1) {
+        if (serverAS == -1) {
+            System.err.println("No connection with the server.");
+            log_file.writeToFile("No connection with the server.");
+        }
+        else {
+            System.err.println("AS" + serverAS + " has timed out.");
             routes_Manager.removeRoutesFromAS(serverAS);
+            log_file.writeToFile("AS" + serverAS + " has timed out.");
         }
     }
 
