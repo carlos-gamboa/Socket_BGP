@@ -7,8 +7,8 @@ public class Connections extends Thread {
     private Socket mini_Server; //Server socket created
     private boolean isOn; //To indicate if the client is active
     private Routes_Manager manager; //Instance used to update all the routes
-    private DataInputStream in; //To write on a socket
-    private DataOutputStream out; //To read from a socket
+    private BufferedReader in; //To write on a socket
+    private PrintWriter out; //To read from a socket
     private File_Manager log_file;
 
     /**
@@ -32,11 +32,11 @@ public class Connections extends Thread {
     private void manageMessages() throws IOException, NullPointerException {
         //Creates a buffer to read a message from the client socket
         if (this.in == null) {
-            this.in = new DataInputStream(mini_Server.getInputStream());
+            this.in = new BufferedReader(new InputStreamReader(mini_Server.getInputStream()));
         }
         //Creates a buffer to write a message to a client socket
         if (this.out == null) {
-            this.out = new DataOutputStream(mini_Server.getOutputStream());
+            this.out = new PrintWriter(mini_Server.getOutputStream(),true);
         }
 
         String message = "";
@@ -47,7 +47,7 @@ public class Connections extends Thread {
 
         //Receive message
         while (currentTime - initialTime <= 30000 && message.equals("")) { //Control time between messages
-            message = in.readUTF(); //Reads the message with the route from the buffer
+            message = in.readLine(); //Reads the message with the route from the buffer
             currentTime = System.currentTimeMillis();
         }
 
@@ -62,7 +62,7 @@ public class Connections extends Thread {
             manager.updateRoutes(message);
             //Send message
             String temporal = manager.routesToString();
-            out.writeUTF(manager.routesToString(as_ID)); //Writes the updated routes to the buffer
+            out.println(manager.routesToString(as_ID)); //Writes the updated routes to the buffer
         }
     }
 
@@ -81,11 +81,7 @@ public class Connections extends Thread {
         }
 
         if (this.out != null) {
-            try {
-                this.out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            this.out.close();
         }
 
         if (this.mini_Server != null) {

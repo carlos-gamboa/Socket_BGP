@@ -1,9 +1,8 @@
 #ID
 2
 #Redes conocidas
-230.9.0.0
-12.111.3.0
+192.168.2.0
 #Vecinos BGP
-127.0.0.01:5555
+10.1.131.35:5555
 #Escuchar vecinos
-3333
+1111

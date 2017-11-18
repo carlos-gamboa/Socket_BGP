@@ -75,7 +75,7 @@ public class Routes_Manager {
                 message = message + key + ":" + arrayToString(route) + ",";
             }
         }
-        return message;
+        return message.substring(0, message.length()-1);
     }
 
     /**
